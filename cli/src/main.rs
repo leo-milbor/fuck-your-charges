@@ -2,8 +2,7 @@ use clap::Parser;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-mod charges_calculator;
-mod http_server;
+use domain;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -14,32 +13,21 @@ struct Cli {
     #[arg(short('s'), long)]
     service: Option<Decimal>,
 
-    #[arg(short('S'), long)]
-    serve: bool,
-
     prices: Vec<Decimal>,
 }
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let cli = Cli::parse();
 
-    let calculator = charges_calculator::ChargesCalculator {
+    let calculator = domain::ChargesCalculator {
         gst: cli.gst.unwrap_or(dec!(9)),
         service: cli.service.unwrap_or(dec!(10)),
     };
 
-    match cli.serve {
-        true => {
-            let res = http_server::serve(calculator).await;
-            println!("done serving: {:?}", res);
-            return;
-        }
-        false => cli_as_calculator(calculator, cli.prices),
-    }
+    cli_as_calculator(calculator, cli.prices)
 }
 
-fn cli_as_calculator(calculator: charges_calculator::ChargesCalculator, prices: Vec<Decimal>) {
+fn cli_as_calculator(calculator: domain::ChargesCalculator, prices: Vec<Decimal>) {
     println!("gst: {:?}%", calculator.gst);
     println!("service charge: {:?}%", calculator.service);
 

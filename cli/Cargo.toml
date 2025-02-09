@@ -1,0 +1,12 @@
+
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+assert_cmd = "2.0.16"
+clap = { version = "4.5.27", features = ["derive"] }
+rust_decimal = "1.36.0"
+rust_decimal_macros = "1.36"

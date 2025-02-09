@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Fuck your charges</title>
+</head>
+
+<body>
+  <h1>What you actually pay:</h1>
+  <ul>
+    {% for user in users %}
+    <li>{{ user.name|e }}</li>
+    {% endfor %}
+  </ul>
+</body>
+
+</html>
