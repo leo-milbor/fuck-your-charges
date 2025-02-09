@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Fuck your charges</title>
+</head>
+
+<body>
+  <h1>What you actually pay:</h1>
+  <ol>
+    {% for price in prices %}
+    <li>Before all charges: {{ price.original_price }}$, after all charges: {{ price.price_to_pay}}$</li>
+    {% endfor %}
+  </ol>
+
+  <a href="/">New payment.</a>
+
+</body>
+
+</html>
