@@ -1,0 +1,33 @@
+#!/usr/bin/bash
+
+display_help() {
+    echo "Usage: $0 {serve|cli}" >&2
+    echo
+    echo "   serve      Build and start an http server"
+    echo "   cli        Build and run the cli (other arguments can be passed, try cli --help)"
+    echo
+
+    exit 1
+}
+
+function build {
+  cargo build
+}
+
+case $1 in
+  serve)
+    build
+    ./target/debug/http_server
+    ;;
+  cli)
+    build
+    shift # pass argument
+    ./target/debug/cli $@
+    ;;
+  build)
+    build
+    ;;
+  *)
+    display_help
+    ;;
+esac
