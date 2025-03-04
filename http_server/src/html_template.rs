@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Template, Debug, Serialize, Deserialize)]
 #[template(path = "fuck-your-charges-form.html")]
 pub struct CalculateChargesForm {
-    pub price: Decimal,
+    pub prices: String,
 }
 
 #[derive(Template, Debug, Serialize, Deserialize)]

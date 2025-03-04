@@ -9,9 +9,10 @@ use axum::{
     Error, Form, Router,
 };
 use html_template::{CalculateChargesForm, CalculateChargesResponse, HtmlTemplate, ToPay};
+use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
-use tokio::net::TcpListener;
 use std::sync::Arc;
+use tokio::net::TcpListener;
 use tracing::{info, Level};
 use tracing_subscriber;
 
@@ -44,14 +45,15 @@ async fn serve(calculator: ChargesCalculator) -> Result<(), Error> {
 }
 
 async fn get_fuck_your_charges_form() -> impl IntoResponse {
-    HtmlTemplate(CalculateChargesForm { price: dec!(0) })
+    HtmlTemplate(CalculateChargesForm { prices: "".to_owned() })
 }
 
 async fn calculate_charges(
     State(calculator): State<Arc<ChargesCalculator>>,
     Form(input): Form<CalculateChargesForm>,
 ) -> impl IntoResponse {
-    let result = calculator.add_charges_per_pax(vec![input.price]);
+    let parsed_input = input.prices.split(' ').map(|s| s.parse::<Decimal>().unwrap()).collect::<Vec<_>>();
+    let result = calculator.add_charges_per_pax(parsed_input);
     let to_pay = result.iter().map(|x| ToPay {
         original_price: x.net_price,
         price_to_pay: x.price_to_pay,

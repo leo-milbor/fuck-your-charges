@@ -2,16 +2,19 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
   <title>Fuck your charges</title>
+  <meta name="description"
+    content="Fuck your charges helps group of friends figuring out how much each paid inclusive of tax when restaurant display only prices with no charges.">
 </head>
 
 <body>
   <h1>What you actually pay:</h1>
-  <ol>
+  <ul>
     {% for price in prices %}
     <li>Before all charges: {{ price.original_price }}$, after all charges: {{ price.price_to_pay}}$</li>
     {% endfor %}
-  </ol>
+  </ul>
 
   <a href="/">New payment.</a>
 
