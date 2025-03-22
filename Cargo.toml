@@ -1,4 +1,4 @@
 [workspace]
 
-members = ["domain", "http_server", "cli"]
+members = ["domain", "http_server", "cli", "flutter_bridge"]
 resolver = "2"
