@@ -3,8 +3,7 @@ use rust_decimal_macros::dec;
 
 #[derive(Clone)]
 pub struct ChargesCalculator {
-    pub gst: Decimal,
-    pub service: Decimal,
+    pub charges: Vec<Decimal>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -18,20 +17,22 @@ impl ChargesCalculator {
         prices
             .iter()
             .map(|p| ToPay {
-                net_price: p.clone(),
-                price_to_pay: self.add_charges(&p),
+                net_price: *p,
+                price_to_pay: self.add_charges(p),
             })
             .collect()
     }
 
     fn add_charges(&self, price: &Decimal) -> Decimal {
-        let coef = dec!(1) + (self.gst + self.service) / dec!(100);
+        let coef = dec!(1) + self.charges.iter().sum::<Decimal>() / dec!(100);
         price * coef
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::vec;
+
     use super::*;
 
     #[derive(Debug)]
@@ -54,8 +55,7 @@ mod tests {
             },
         ];
         let calculator = ChargesCalculator {
-            gst: dec!(9),
-            service: dec!(10),
+            charges: vec![dec!(9), dec!(10)],
         };
 
         for ele in values {
@@ -81,8 +81,7 @@ mod tests {
             },
         ];
         let calculator = ChargesCalculator {
-            gst: dec!(9),
-            service: dec!(10),
+            charges: vec![dec!(9), dec!(10)],
         };
 
         // act

@@ -2,8 +2,6 @@ use clap::Parser;
 use rust_decimal::Decimal;
 use rust_decimal_macros::dec;
 
-use domain;
-
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -18,18 +16,19 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
+    let service = cli.service.unwrap_or(dec!(10));
+    let gst = cli.gst.unwrap_or(dec!(9));
 
     let calculator = domain::ChargesCalculator {
-        gst: cli.gst.unwrap_or(dec!(9)),
-        service: cli.service.unwrap_or(dec!(10)),
+        charges: vec![service, gst],
     };
 
     cli_as_calculator(calculator, cli.prices)
 }
 
 fn cli_as_calculator(calculator: domain::ChargesCalculator, prices: Vec<Decimal>) {
-    println!("gst: {:?}%", calculator.gst);
-    println!("service charge: {:?}%", calculator.service);
+    println!("gst: {:?}%", calculator.charges[0]);
+    println!("service charge: {:?}%", calculator.charges[1]);
 
     for ele in calculator.add_charges_per_pax(prices) {
         println!(

@@ -19,8 +19,7 @@ use tracing_subscriber;
 #[tokio::main]
 pub async fn main() -> Result<(), Error> {
     let calculator = domain::ChargesCalculator {
-        gst: dec!(9),
-        service: dec!(10),
+        charges: vec![dec!(19)],
     };
 
     serve(calculator).await
