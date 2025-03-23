@@ -1355,7 +1355,10 @@ dependencies = [
 name = "rust_lib_flutter_gui"
 version = "0.1.0"
 dependencies = [
+ "domain",
  "flutter_rust_bridge",
+ "rust_decimal",
+ "rust_decimal_macros",
 ]
 
 [[package]]

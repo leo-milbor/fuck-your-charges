@@ -8,3 +8,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 String greet({required String name}) =>
     RustLib.instance.api.crateApiSimpleGreet(name: name);
+
+List<(String, String)> calculateCharges({
+  required List<String> prices,
+  required List<String> charges,
+}) => RustLib.instance.api.crateApiSimpleCalculateCharges(
+  prices: prices,
+  charges: charges,
+);

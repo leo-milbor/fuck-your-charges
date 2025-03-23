@@ -3,8 +3,11 @@
 display_help() {
     echo "Usage: $0 {serve|cli}" >&2
     echo
-    echo "   serve      Build and start an http server"
-    echo "   cli        Build and run the cli (other arguments can be passed, try cli --help)"
+    echo "   gui          Build and start the gui in desktop mode"
+    echo "   serve        Build and start an http server"
+    echo "   cli          Build and run the cli (other arguments can be passed, try cli --help)"
+    echo "   build        Build all packages"
+    echo "   build-bridge Build all packages and linker for the flutter app"
     echo
 
     exit 1
@@ -14,7 +17,19 @@ function build {
   cargo build
 }
 
+function build-bridge {
+    cd flutter_gui
+    flutter_rust_bridge_codegen generate
+    cd -
+}
+
 case $1 in
+  gui)
+    build-bridge
+    cd flutter_gui
+    flutter run
+    cd -
+    ;;
   serve)
     build
     ./target/debug/http_server
@@ -26,6 +41,9 @@ case $1 in
     ;;
   build)
     build
+    ;;
+  build-bridge)
+    build-bridge
     ;;
   *)
     display_help
