@@ -64,28 +64,17 @@ class FuckYourChargesState extends State<FuckYourChargesApp> {
                 children:
                     calculateCharges(prices: _prices, charges: _charges)
                         .map(
-                          (t) => Row(
+                          (t) => Wrap(
+                            direction: Axis.horizontal,
                             children: [
+                              Text('What was written: '),
                               Text(
-                                style: TextStyle(fontSize: 25),
-                                'What was written: ',
-                              ),
-                              Text(
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                                 t.$1,
                               ),
+                              Text(' what you actually paid: '),
                               Text(
-                                style: TextStyle(fontSize: 25),
-                                ' what you actually paid: ',
-                              ),
-                              Text(
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.bold),
                                 t.$2,
                               ),
                             ],
