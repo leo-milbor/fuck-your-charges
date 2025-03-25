@@ -22,25 +22,76 @@ class FuckYourChargesState extends State<FuckYourChargesApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
-        body: Center(
+        appBar: AppBar(
+          title: Center(
+            child: const Text(
+              style: TextStyle(fontWeight: FontWeight.bold),
+              'Fuck you charges!',
+            ),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             children: [
-              DecimalListWidget(
-                callback: (values) => setState(() => _charges = values),
-                defaultValue: '10 9',
+              SizedBox(
+                child: DecimalListWidget(
+                  callback: (values) => setState(() => _charges = values),
+                  defaultValue: '10 9',
+                  inputDecoration: const InputDecoration(
+                    filled: true,
+                    hintText: 'Enter space separated charges.',
+                    labelText: 'Charges',
+                  ),
+                ),
               ),
-              DecimalListWidget(
-                callback: (values) => setState(() => _prices = values),
-                defaultValue: '',
+              SizedBox(height: 10),
+              SizedBox(
+                child: DecimalListWidget(
+                  callback: (values) => setState(() => _prices = values),
+                  defaultValue: '',
+                  inputDecoration: const InputDecoration(
+                    filled: true,
+                    hintText: 'Enter space separated prices.',
+                    labelText: 'Prices',
+                  ),
+                ),
               ),
-              Text(
-                calculateCharges(prices: _prices, charges: _charges)
-                    .map(
-                      (t) =>
-                          'What was written: ${t.$1}, what you actually paid: ${t.$2}',
-                    )
-                    .join('\n'),
+              SizedBox(height: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children:
+                    calculateCharges(prices: _prices, charges: _charges)
+                        .map(
+                          (t) => Row(
+                            children: [
+                              Text(
+                                style: TextStyle(fontSize: 25),
+                                'What was written: ',
+                              ),
+                              Text(
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                t.$1,
+                              ),
+                              Text(
+                                style: TextStyle(fontSize: 25),
+                                ' what you actually paid: ',
+                              ),
+                              Text(
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                t.$2,
+                              ),
+                            ],
+                          ),
+                        )
+                        .toList(),
               ),
             ],
           ),
@@ -60,11 +111,13 @@ class DecimalListWidget extends StatefulWidget {
 
   final DecimalListCallback callback;
   final String defaultValue;
+  final InputDecoration? inputDecoration;
 
   const DecimalListWidget({
     super.key,
     required this.callback,
     required this.defaultValue,
+    this.inputDecoration,
   });
 
   @override
@@ -73,6 +126,7 @@ class DecimalListWidget extends StatefulWidget {
 
 class _DecimalListWidgetState extends State<DecimalListWidget> {
   final _key = GlobalKey<FormState>();
+  InputDecoration? inputDecoration;
   TextEditingController controller = TextEditingController(text: '');
   String defaultValue = '';
 
@@ -81,6 +135,7 @@ class _DecimalListWidgetState extends State<DecimalListWidget> {
     super.initState();
     defaultValue = widget.defaultValue;
     controller = TextEditingController(text: defaultValue);
+    inputDecoration = widget.inputDecoration;
 
     controller.addListener(() {
       setState(() {
@@ -97,6 +152,9 @@ class _DecimalListWidgetState extends State<DecimalListWidget> {
       child: Form(
         key: _key,
         child: TextFormField(
+          autofocus: true,
+          textInputAction: TextInputAction.next,
+          decoration: inputDecoration,
           controller: controller,
           validator: (value) {
             if (value == null ||
