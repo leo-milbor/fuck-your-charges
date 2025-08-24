@@ -1,136 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:fuck_your_charges/charge_calculator.dart';
+import 'package:fuck_your_charges/price_tracker.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  static const String title = 'Fuck your charges!';
+
+  static const charges = <Charge>[
+    Charge(rate: 0.09, label: 'GST'),
+    Charge(rate: 0.10, label: 'Service Charge'),
+  ];
+
+  static var calculator = ChargeCalculator(charges);
+
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fuck your charges!',
+      title: title,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
       ),
-      home: const MainPage(title: 'Fuck your charges!'),
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  double _finalPrice = 0;
-  final _netPrice = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-
-  @override
-  void dispose() {
-    _netPrice.dispose();
-    super.dispose();
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
-        return;
-      }
-      _finalPrice =  double.parse(_netPrice.text) * 1.19;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(child: Text(widget.title)),
-      ),
-      body: Center(
-        child: Column(
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('Prices inclusive of charges and GST:'),
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                  controller: _netPrice,
-                  textAlign: TextAlign.center,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a price';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'Please enter a valid price. e.g. 13.45';
-                    }
-                    return null;
-                  },
-              ),
-            ),
-
-            const Text('Prices inclusive of charges and GST:'),
-            Text(
-              '$_finalPrice',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const Text('au total'),
-            FloatingActionButton(
-              onPressed: _incrementCounter,
-              tooltip: 'Calculate charges',
-              child: const Icon(Icons.calculate),
-            ),
-          ],
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Center(child: Text(title)),
         ),
+        body: PriceTracker(calculator: calculator),
+        // home: const MainPage(title: 'Fuck your charges!'),
       ),
-      //floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Calculate charges',
-      //   child: const Icon(Icons.calculate),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
