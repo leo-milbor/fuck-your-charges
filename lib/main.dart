@@ -10,8 +10,8 @@ class MyApp extends StatelessWidget {
   static const String title = 'Fuck your charges!';
 
   static const charges = <Charge>[
-    Charge(rate: 0.09, label: 'GST'),
     Charge(rate: 0.10, label: 'Service Charge'),
+    Charge(rate: 0.09, label: 'GST'),
   ];
 
   static var calculator = ChargeCalculator(charges);
@@ -30,7 +30,10 @@ class MyApp extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Center(child: Text(title)),
         ),
-        body: PriceTracker(calculator: calculator),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: PriceTracker(calculator: calculator),
+        ),
         // home: const MainPage(title: 'Fuck your charges!'),
       ),
     );

@@ -16,7 +16,7 @@ class _PriceTrackerState extends State<PriceTracker> {
 
   void addPriceRow() {
     setState(() {
-      prices.insert(0, 0);
+      prices.add(0);
       updateTotal();
     });
   }
