@@ -7,8 +7,8 @@ class Charge {
 
 class ChargeCalculator {
   List<Charge> charges = [
-    Charge(rate: 0.09, label: 'GST'),
     Charge(rate: 0.10, label: 'Service Charge'),
+    Charge(rate: 0.09, label: 'GST'),
   ];
 
   ChargeCalculator(this.charges);
