@@ -14,7 +14,7 @@ class _PriceTrackerState extends State<PriceTracker> {
   List<double> prices = [0];
   Widget totalBreakdown = Text('No prices yet!');
 
-  void addPriceRow() {
+  void onUserValidate() {
     setState(() {
       prices.add(0);
       updateTotal();
@@ -31,13 +31,11 @@ class _PriceTrackerState extends State<PriceTracker> {
   }
 
   void updatePrice(int index, String value) {
-    final double? price = double.tryParse(value);
-    if (price != null) {
-      setState(() {
-        prices[index] = price;
-        updateTotal();
-      });
-    }
+    final double price = double.tryParse(value) ?? 0;
+    setState(() {
+      prices[index] = price;
+      updateTotal();
+    });
   }
 
   void updateTotal() {
@@ -59,13 +57,13 @@ class _PriceTrackerState extends State<PriceTracker> {
                 calculator: widget.calculator,
                 onDelete: () => removePriceRow(index),
                 onUpdate: (value) => updatePrice(index, value),
-                onUserValidate: addPriceRow,
+                onUserValidate: onUserValidate,
               );
             },
           ),
         ),
         ElevatedButton(
-          onPressed: addPriceRow,
+          onPressed: onUserValidate,
           child: const Text('Add Price Row'),
         ),
         const SizedBox(height: 16),
@@ -97,12 +95,30 @@ class PriceRow extends StatefulWidget {
 
 class _PriceRowState extends State<PriceRow> {
   double price = 0;
+  late FocusNode focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
 
   void onUpdate(String value) {
     widget.onUpdate(value);
     setState(() {
-      price = double.parse(value);
+      price = double.tryParse(value) ?? 0;
     });
+  }
+
+  void onValidate() {
+    widget.onUserValidate();
+    focusNode.unfocus();
   }
 
   @override
@@ -123,8 +139,9 @@ class _PriceRowState extends State<PriceRow> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: onUpdate,
-                  onEditingComplete: widget.onUserValidate,
+                  onEditingComplete: onValidate,
                   autofocus: true,
+                  focusNode: focusNode,
                 ),
               ),
               const SizedBox(width: 16),
