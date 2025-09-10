@@ -56,7 +56,6 @@ class _PriceTrackerState extends State<PriceTracker> {
             addAutomaticKeepAlives: true,
             itemBuilder: (context, index) {
               return PriceRow(
-                key: Key(index.toString()),
                 value: prices[index],
                 calculator: widget.calculator,
                 onDelete: () => removePriceRow(index),
@@ -95,21 +94,9 @@ class PriceRow extends StatefulWidget {
   }
 }
 
-class _PriceRowState extends State<PriceRow> {
+class _PriceRowState extends State<PriceRow> with AutomaticKeepAliveClientMixin {
   double? price;
   late FocusNode focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    focusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    focusNode.dispose();
-    super.dispose();
-  }
 
   void onUpdate(String value) {
     setState(() {
@@ -126,7 +113,23 @@ class _PriceRowState extends State<PriceRow> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
