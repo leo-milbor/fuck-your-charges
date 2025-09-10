@@ -11,14 +11,16 @@ class PriceTracker extends StatefulWidget {
 }
 
 class _PriceTrackerState extends State<PriceTracker> {
-  List<double> prices = [0];
+  List<double?> prices = [null];
   Widget totalBreakdown = Text('No prices yet!');
 
-  void onUserValidate() {
-    setState(() {
-      prices.add(0);
-      updateTotal();
-    });
+  void onTryAdd() {
+    if (!prices.any((p) => p == null)) {
+      setState(() {
+        prices.add(null);
+        updateTotal();
+      });
+    }
   }
 
   void removePriceRow(int index) {
@@ -30,17 +32,16 @@ class _PriceTrackerState extends State<PriceTracker> {
     });
   }
 
-  void updatePrice(int index, String value) {
-    final double price = double.tryParse(value) ?? 0;
+  void updatePrice(int index, double? value) {
     setState(() {
-      prices[index] = price;
+      prices[index] = value;
       updateTotal();
     });
   }
 
   void updateTotal() {
     totalBreakdown = TotalBreakdown(
-      prices: prices,
+      prices: prices.map((p) => p ?? 0),
       calculator: widget.calculator,
     );
   }
@@ -52,20 +53,20 @@ class _PriceTrackerState extends State<PriceTracker> {
         Expanded(
           child: ListView.builder(
             itemCount: prices.length,
+            addAutomaticKeepAlives: true,
             itemBuilder: (context, index) {
               return PriceRow(
+                key: Key(index.toString()),
+                value: prices[index],
                 calculator: widget.calculator,
                 onDelete: () => removePriceRow(index),
                 onUpdate: (value) => updatePrice(index, value),
-                onUserValidate: onUserValidate,
+                onUserValidate: onTryAdd,
               );
             },
           ),
         ),
-        ElevatedButton(
-          onPressed: onUserValidate,
-          child: const Text('Add Price Row'),
-        ),
+        ElevatedButton(onPressed: onTryAdd, child: const Text('Add Price Row')),
         const SizedBox(height: 16),
         totalBreakdown,
       ],
@@ -77,7 +78,7 @@ class PriceRow extends StatefulWidget {
   final ChargeCalculator calculator;
   final VoidCallback onDelete;
   final VoidCallback onUserValidate;
-  final Function(String) onUpdate;
+  final Function(double?) onUpdate;
 
   const PriceRow({
     super.key,
@@ -85,6 +86,7 @@ class PriceRow extends StatefulWidget {
     required this.onDelete,
     required this.onUpdate,
     required this.onUserValidate,
+    required double? value,
   });
 
   @override
@@ -94,7 +96,7 @@ class PriceRow extends StatefulWidget {
 }
 
 class _PriceRowState extends State<PriceRow> {
-  double price = 0;
+  double? price;
   late FocusNode focusNode;
 
   @override
@@ -110,15 +112,17 @@ class _PriceRowState extends State<PriceRow> {
   }
 
   void onUpdate(String value) {
-    widget.onUpdate(value);
     setState(() {
-      price = double.tryParse(value) ?? 0;
+      price = double.tryParse(value);
     });
+    widget.onUpdate(price);
   }
 
   void onValidate() {
-    widget.onUserValidate();
-    focusNode.unfocus();
+    if (price != null) {
+      widget.onUserValidate();
+      focusNode.unfocus();
+    }
   }
 
   @override
@@ -150,7 +154,7 @@ class _PriceRowState extends State<PriceRow> {
                 child: Container(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'Final: ${widget.calculator.calculateFinalPrice(price).toStringAsFixed(2)}',
+                    'Final: ${widget.calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -167,14 +171,14 @@ class _PriceRowState extends State<PriceRow> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children:
-                widget.calculator.calculateTaxBreakdown(price).entries.map((
-                  entry,
-                ) {
-                  return Text(
-                    '${entry.key}: ${entry.value.toStringAsFixed(2)}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  );
-                }).toList(),
+                widget.calculator.calculateTaxBreakdown(price ?? 0).entries.map(
+                  (entry) {
+                    return Text(
+                      '${entry.key}: ${entry.value.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    );
+                  },
+                ).toList(),
           ),
         ],
       ),
@@ -183,7 +187,7 @@ class _PriceRowState extends State<PriceRow> {
 }
 
 class TotalBreakdown extends StatelessWidget {
-  final List<double> prices;
+  final Iterable<double> prices;
   final ChargeCalculator calculator;
 
   const TotalBreakdown({
