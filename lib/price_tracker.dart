@@ -1,45 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
+import 'package:fuck_your_charges/total_breakdown.dart';
+import 'package:fuck_your_charges/price_row.dart';
 
 class PriceTracker extends StatefulWidget {
   final ChargeCalculator calculator;
+  final List<double?> prices;
 
-  const PriceTracker({super.key, required this.calculator});
+  const PriceTracker({
+    super.key,
+    required this.calculator,
+    required this.prices,
+  });
 
   @override
   State<PriceTracker> createState() => _PriceTrackerState();
 }
 
 class _PriceTrackerState extends State<PriceTracker> {
-  List<double?> prices = [null];
+  List<double?> get prices => widget.prices;
+  late List<UniqueKey?> keys = widget.prices.map((p) => UniqueKey()).toList();
   Widget totalBreakdown = Text('No prices yet!');
 
-  void onTryAdd() {
+  void tryAdd() {
     if (!prices.any((p) => p == null)) {
       setState(() {
         prices.add(null);
-        updateTotal();
+        keys.add(UniqueKey());
+        updateTotalBreakdown();
       });
     }
   }
 
-  void removePriceRow(int index) {
+  void tryRemoveAt(int index) {
     setState(() {
       if (prices.length > 1) {
         prices.removeAt(index);
-        updateTotal();
+        keys.removeAt(index);
+        updateTotalBreakdown();
+      } else {
+        prices[0] = null;
       }
     });
   }
 
-  void updatePrice(int index, double? value) {
+  void updatePrice(int index, double? price) {
     setState(() {
-      prices[index] = value;
-      updateTotal();
+      prices[index] = price;
+      updateTotalBreakdown();
     });
   }
 
-  void updateTotal() {
+  void updateTotalBreakdown() {
     totalBreakdown = TotalBreakdown(
       prices: prices.map((p) => p ?? 0),
       calculator: widget.calculator,
@@ -56,175 +68,19 @@ class _PriceTrackerState extends State<PriceTracker> {
             addAutomaticKeepAlives: true,
             itemBuilder: (context, index) {
               return PriceRow(
-                value: prices[index],
+                key: keys[index],
+                price: prices[index],
                 calculator: widget.calculator,
-                onDelete: () => removePriceRow(index),
-                onUpdate: (value) => updatePrice(index, value),
-                onUserValidate: onTryAdd,
+                onDelete: () => tryRemoveAt(index),
+                onUpdate: (price) => updatePrice(index, price),
+                onUserValidate: tryAdd,
               );
             },
           ),
         ),
-        ElevatedButton(onPressed: onTryAdd, child: const Text('Add Price Row')),
+        ElevatedButton(onPressed: tryAdd, child: const Text('Add Price Row')),
         const SizedBox(height: 16),
         totalBreakdown,
-      ],
-    );
-  }
-}
-
-class PriceRow extends StatefulWidget {
-  final ChargeCalculator calculator;
-  final VoidCallback onDelete;
-  final VoidCallback onUserValidate;
-  final Function(double?) onUpdate;
-
-  const PriceRow({
-    super.key,
-    required this.calculator,
-    required this.onDelete,
-    required this.onUpdate,
-    required this.onUserValidate,
-    required double? value,
-  });
-
-  @override
-  State<StatefulWidget> createState() {
-    return _PriceRowState();
-  }
-}
-
-class _PriceRowState extends State<PriceRow> with AutomaticKeepAliveClientMixin {
-  double? price;
-  late FocusNode focusNode;
-
-  void onUpdate(String value) {
-    setState(() {
-      price = double.tryParse(value);
-    });
-    widget.onUpdate(price);
-  }
-
-  void onValidate() {
-    if (price != null) {
-      widget.onUserValidate();
-      focusNode.unfocus();
-    }
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    focusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: TextField(
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    labelText: 'Base Price',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: onUpdate,
-                  onEditingComplete: onValidate,
-                  autofocus: true,
-                  focusNode: focusNode,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'Final: ${widget.calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: widget.onDelete,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Show tax breakdown
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:
-                widget.calculator.calculateTaxBreakdown(price ?? 0).entries.map(
-                  (entry) {
-                    return Text(
-                      '${entry.key}: ${entry.value.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    );
-                  },
-                ).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class TotalBreakdown extends StatelessWidget {
-  final Iterable<double> prices;
-  final ChargeCalculator calculator;
-
-  const TotalBreakdown({
-    super.key,
-    required this.prices,
-    required this.calculator,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Base Total: ${prices.reduce((a, b) => a + b).toStringAsFixed(2)}',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        ...calculator.charges.map((charge) {
-          final chargeAmount = prices
-              .map((p) => calculator.calculateTaxBreakdown(p)[charge.label]!)
-              .reduce((a, b) => a + b);
-          return Text(
-            '${charge.label}: ${chargeAmount.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.titleMedium,
-          );
-        }),
-        Text(
-          'Final Total: ${calculator.calculateFinalPrice(prices.reduce((a, b) => a + b)).toStringAsFixed(2)}',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
       ],
     );
   }

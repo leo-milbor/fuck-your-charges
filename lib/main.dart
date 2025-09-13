@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: PriceTracker(calculator: calculator),
+          child: PriceTracker(calculator: calculator, prices: [null]),
         ),
         // home: const MainPage(title: 'Fuck your charges!'),
       ),
