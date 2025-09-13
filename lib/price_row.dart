@@ -25,30 +25,20 @@ class PriceRow extends StatefulWidget {
 
 class _PriceRowState extends State<PriceRow>
     with AutomaticKeepAliveClientMixin {
-  static const Widget emptyPriceWidget = Text("No price yet.");
   double? price;
   late FocusNode focusNode;
-  Widget priceBreakDown = emptyPriceWidget;
+  late Widget priceBreakDown;
   TextEditingController controller = TextEditingController();
 
   void onUpdate(String value) {
     setState(() {
       price = double.tryParse(value);
-      updateBreakdown();
+      priceBreakDown = PriceBreakDown(
+        calculator: widget.calculator,
+        price: price!,
+      );
       widget.onUpdate(price);
     });
-  }
-
-  void updateBreakdown() {
-    if (price == null) {
-      priceBreakDown = emptyPriceWidget;
-      return;
-    }
-
-    priceBreakDown = PriceBreakDown(
-      calculator: widget.calculator,
-      price: price!,
-    );
   }
 
   void onValidate() {
@@ -66,10 +56,10 @@ class _PriceRowState extends State<PriceRow>
     super.initState();
     price = widget.price;
     controller.text = price == null ? "" : price!.toStringAsFixed(2);
-    priceBreakDown =
-        price == null
-            ? emptyPriceWidget
-            : PriceBreakDown(calculator: widget.calculator, price: price!);
+    priceBreakDown = PriceBreakDown(
+      calculator: widget.calculator,
+      price: price,
+    );
     focusNode = FocusNode();
   }
 
@@ -111,7 +101,9 @@ class _PriceRowState extends State<PriceRow>
                 child: Container(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'Final: ${widget.calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
+                    price == null
+                        ? "No full price to show."
+                        : 'Final: ${widget.calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -123,7 +115,6 @@ class _PriceRowState extends State<PriceRow>
               ),
             ],
           ),
-          const SizedBox(height: 8),
           // Show tax breakdown
           priceBreakDown,
         ],
@@ -133,8 +124,9 @@ class _PriceRowState extends State<PriceRow>
 }
 
 class PriceBreakDown extends StatelessWidget {
+  static const Text emptyPriceWidget = Text("No price to break down.");
   final ChargeCalculator calculator;
-  final double price;
+  final double? price;
 
   const PriceBreakDown({
     super.key,
@@ -144,15 +136,17 @@ class PriceBreakDown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          calculator.calculateTaxBreakdown(price).entries.map((entry) {
-            return Text(
-              '${entry.key}: ${entry.value.toStringAsFixed(2)}',
-              style: Theme.of(context).textTheme.bodySmall,
-            );
-          }).toList(),
-    );
+    return price == null
+        ? emptyPriceWidget
+        : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:
+              calculator.calculateTaxBreakdown(price!).entries.map((entry) {
+                return Text(
+                  '${entry.key}: ${entry.value.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                );
+              }).toList(),
+        );
   }
 }

@@ -63,9 +63,12 @@ class _PriceTrackerState extends State<PriceTracker> {
     return Column(
       children: [
         Expanded(
-          child: ListView.builder(
+          child: ListView.separated(
             itemCount: prices.length,
             addAutomaticKeepAlives: true,
+            separatorBuilder: (context, index) {
+              return const Divider();
+            },
             itemBuilder: (context, index) {
               return PriceRow(
                 key: keys[index],
