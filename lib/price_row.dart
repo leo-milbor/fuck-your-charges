@@ -26,8 +26,9 @@ class PriceRow extends StatefulWidget {
 class _PriceRowState extends State<PriceRow>
     with AutomaticKeepAliveClientMixin {
   double? price;
+  late PriceBreakDown priceBreakDown;
+  late FullPrice fullPrice;
   late FocusNode focusNode;
-  late Widget priceBreakDown;
   TextEditingController controller = TextEditingController();
 
   void onUpdate(String value) {
@@ -35,8 +36,9 @@ class _PriceRowState extends State<PriceRow>
       price = double.tryParse(value);
       priceBreakDown = PriceBreakDown(
         calculator: widget.calculator,
-        price: price!,
+        price: price,
       );
+      fullPrice = FullPrice(calculator: widget.calculator, price: price);
       widget.onUpdate(price);
     });
   }
@@ -60,6 +62,7 @@ class _PriceRowState extends State<PriceRow>
       calculator: widget.calculator,
       price: price,
     );
+    fullPrice = FullPrice(calculator: widget.calculator, price: price);
     focusNode = FocusNode();
   }
 
@@ -100,12 +103,7 @@ class _PriceRowState extends State<PriceRow>
                 flex: 2,
                 child: Container(
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    price == null
-                        ? "No full price to show."
-                        : 'Final: ${widget.calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  child: fullPrice,
                 ),
               ),
               const SizedBox(width: 16),
@@ -119,6 +117,23 @@ class _PriceRowState extends State<PriceRow>
           priceBreakDown,
         ],
       ),
+    );
+  }
+}
+
+class FullPrice extends StatelessWidget {
+  final double? price;
+  final ChargeCalculator calculator;
+
+  const FullPrice({super.key, required this.calculator, required this.price});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      price == null
+          ? 'No full price to show.'
+          : 'Final: ${calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
+      style: const TextStyle(fontWeight: FontWeight.bold),
     );
   }
 }
