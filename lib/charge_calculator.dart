@@ -6,14 +6,9 @@ class Charge {
 }
 
 class ChargeCalculator {
-  List<Charge> charges = [
-    Charge(rate: 0.10, label: 'Service Charge'),
-    Charge(rate: 0.09, label: 'GST'),
-  ];
+  final List<Charge> charges;
+  ChargeCalculator({required this.charges});
 
-  ChargeCalculator(this.charges);
-
-  // Calculate price with all charges applied
   double calculateFinalPrice(double basePrice) {
     double currentPrice = basePrice;
     for (final tax in charges) {
@@ -22,7 +17,6 @@ class ChargeCalculator {
     return currentPrice;
   }
 
-  // Calculate individual charge impact
   Map<String, double> calculateTaxBreakdown(double basePrice) {
     final breakdown = <String, double>{};
     double currentPrice = basePrice;

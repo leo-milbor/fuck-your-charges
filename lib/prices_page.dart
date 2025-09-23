@@ -3,21 +3,17 @@ import 'package:fuck_your_charges/charge_calculator.dart';
 import 'package:fuck_your_charges/total_breakdown.dart';
 import 'package:fuck_your_charges/price_entry.dart';
 
-class PriceTracker extends StatefulWidget {
+class PricesPage extends StatefulWidget {
   final ChargeCalculator calculator;
   final List<double?> prices;
 
-  const PriceTracker({
-    super.key,
-    required this.calculator,
-    required this.prices,
-  });
+  const PricesPage({super.key, required this.calculator, required this.prices});
 
   @override
-  State<PriceTracker> createState() => _PriceTrackerState();
+  State<PricesPage> createState() => _PricesPageState();
 }
 
-class _PriceTrackerState extends State<PriceTracker> {
+class _PricesPageState extends State<PricesPage> {
   List<double?> get prices => widget.prices;
   late List<UniqueKey?> keys = widget.prices.map((p) => UniqueKey()).toList();
   Widget totalBreakdown = Text('No prices yet!');
@@ -81,7 +77,6 @@ class _PriceTrackerState extends State<PriceTracker> {
             },
           ),
         ),
-        ElevatedButton(onPressed: tryAdd, child: const Text('Add Price Row')),
         const SizedBox(height: 16),
         totalBreakdown,
       ],
