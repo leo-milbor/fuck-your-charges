@@ -1,6 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
 
+class FullPrice extends StatelessWidget {
+  final double? price;
+  final ChargeCalculator calculator;
+
+  const FullPrice({super.key, required this.calculator, required this.price});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      price == null
+          ? 'No full price to show.'
+          : 'Final: ${calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+class PriceBreakDown extends StatelessWidget {
+  static const Text emptyPriceWidget = Text("No price to break down.");
+  final ChargeCalculator calculator;
+  final double? price;
+
+  const PriceBreakDown({
+    super.key,
+    required this.calculator,
+    required this.price,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return price == null
+        ? emptyPriceWidget
+        : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:
+              calculator.calculateTaxBreakdown(price!).entries.map((entry) {
+                return Text(
+                  '${entry.key}: ${entry.value.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                );
+              }).toList(),
+        );
+  }
+}
+
 class PriceEntry extends StatefulWidget {
   final ChargeCalculator calculator;
   final VoidCallback onDelete;
@@ -31,46 +76,8 @@ class _PriceEntryState extends State<PriceEntry>
   late FocusNode focusNode;
   TextEditingController controller = TextEditingController();
 
-  void onUpdate(String value) {
-    setState(() {
-      price = double.tryParse(value);
-      priceBreakDown = PriceBreakDown(
-        calculator: widget.calculator,
-        price: price,
-      );
-      fullPrice = FullPrice(calculator: widget.calculator, price: price);
-      widget.onUpdate(price);
-    });
-  }
-
-  void onValidate() {
-    if (price != null) {
-      widget.onUserValidate();
-      focusNode.unfocus();
-    }
-  }
-
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    price = widget.price;
-    controller.text = price == null ? "" : price!.toStringAsFixed(2);
-    priceBreakDown = PriceBreakDown(
-      calculator: widget.calculator,
-      price: price,
-    );
-    fullPrice = FullPrice(calculator: widget.calculator, price: price);
-    focusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    focusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,49 +126,42 @@ class _PriceEntryState extends State<PriceEntry>
       ),
     );
   }
-}
-
-class FullPrice extends StatelessWidget {
-  final double? price;
-  final ChargeCalculator calculator;
-
-  const FullPrice({super.key, required this.calculator, required this.price});
 
   @override
-  Widget build(BuildContext context) {
-    return Text(
-      price == null
-          ? 'No full price to show.'
-          : 'Final: ${calculator.calculateFinalPrice(price ?? 0).toStringAsFixed(2)}',
-      style: const TextStyle(fontWeight: FontWeight.bold),
-    );
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
   }
-}
-
-class PriceBreakDown extends StatelessWidget {
-  static const Text emptyPriceWidget = Text("No price to break down.");
-  final ChargeCalculator calculator;
-  final double? price;
-
-  const PriceBreakDown({
-    super.key,
-    required this.calculator,
-    required this.price,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return price == null
-        ? emptyPriceWidget
-        : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:
-              calculator.calculateTaxBreakdown(price!).entries.map((entry) {
-                return Text(
-                  '${entry.key}: ${entry.value.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                );
-              }).toList(),
-        );
+  void initState() {
+    super.initState();
+    price = widget.price;
+    controller.text = price == null ? "" : price!.toStringAsFixed(2);
+    priceBreakDown = PriceBreakDown(
+      calculator: widget.calculator,
+      price: price,
+    );
+    fullPrice = FullPrice(calculator: widget.calculator, price: price);
+    focusNode = FocusNode();
+  }
+
+  void onUpdate(String value) {
+    setState(() {
+      price = double.tryParse(value);
+      priceBreakDown = PriceBreakDown(
+        calculator: widget.calculator,
+        price: price,
+      );
+      fullPrice = FullPrice(calculator: widget.calculator, price: price);
+      widget.onUpdate(price);
+    });
+  }
+
+  void onValidate() {
+    if (price != null) {
+      widget.onUserValidate();
+      focusNode.unfocus();
+    }
   }
 }

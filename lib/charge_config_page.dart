@@ -12,9 +12,31 @@ class ChargesConfigPage extends StatefulWidget {
 }
 
 class _ChargesConfigPageState extends State<ChargesConfigPage> {
-  List<Charge> get charges => widget.calculator.charges;
-  late List<UniqueKey?> keys =
+  late List<UniqueKey> keys =
       widget.calculator.charges.map((p) => UniqueKey()).toList();
+  List<Charge> get charges => widget.calculator.charges;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: charges.length,
+            itemBuilder: (context, index) {
+              return ChargeEntry(
+                key: keys[index],
+                onDelete: () => tryRemoveAt(index),
+                onUpdate: (charge) => updateCharges(index, charge),
+                onUserValidate: tryAdd,
+                charge: charges[index],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 
   void tryAdd() {
     if (!charges.any((c) => c.rate == 0 || c.label == "")) {
@@ -40,26 +62,5 @@ class _ChargesConfigPageState extends State<ChargesConfigPage> {
     setState(() {
       charges[index] = charge;
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: charges.length,
-            itemBuilder: (context, index) {
-              return ChargeEntry(
-                onDelete: () => tryRemoveAt(index),
-                onUpdate: (charge) => updateCharges(index, charge),
-                onUserValidate: tryAdd,
-                charge: charges[index],
-              );
-            },
-          ),
-        ),
-      ],
-    );
   }
 }

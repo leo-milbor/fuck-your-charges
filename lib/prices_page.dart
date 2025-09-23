@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
-import 'package:fuck_your_charges/total_breakdown.dart';
 import 'package:fuck_your_charges/price_entry.dart';
+import 'package:fuck_your_charges/total_breakdown.dart';
 
 class PricesPage extends StatefulWidget {
   final ChargeCalculator calculator;
@@ -14,9 +14,44 @@ class PricesPage extends StatefulWidget {
 }
 
 class _PricesPageState extends State<PricesPage> {
-  List<double?> get prices => widget.prices;
   late List<UniqueKey?> keys = widget.prices.map((p) => UniqueKey()).toList();
   Widget totalBreakdown = Text('No prices yet!');
+  List<double?> get prices => widget.prices;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.separated(
+            itemCount: prices.length,
+            addAutomaticKeepAlives: true,
+            separatorBuilder: (context, index) {
+              return const Divider();
+            },
+            itemBuilder: (context, index) {
+              return PriceEntry(
+                key: keys[index],
+                price: prices[index],
+                calculator: widget.calculator,
+                onDelete: () => tryRemoveAt(index),
+                onUpdate: (price) => updatePrices(index, price),
+                onUserValidate: tryAdd,
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        totalBreakdown,
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    updateTotalBreakdown();
+    super.initState();
+  }
 
   void tryAdd() {
     if (!prices.any((p) => p == null)) {
@@ -51,41 +86,6 @@ class _PricesPageState extends State<PricesPage> {
     totalBreakdown = TotalBreakdown(
       prices: prices.map((p) => p ?? 0),
       calculator: widget.calculator,
-    );
-  }
-
-  @override
-  void initState() {
-    updateTotalBreakdown();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            itemCount: prices.length,
-            addAutomaticKeepAlives: true,
-            separatorBuilder: (context, index) {
-              return const Divider();
-            },
-            itemBuilder: (context, index) {
-              return PriceEntry(
-                key: keys[index],
-                price: prices[index],
-                calculator: widget.calculator,
-                onDelete: () => tryRemoveAt(index),
-                onUpdate: (price) => updatePrices(index, price),
-                onUserValidate: tryAdd,
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 16),
-        totalBreakdown,
-      ],
     );
   }
 }

@@ -9,6 +9,10 @@ class ChargeCalculator {
   final List<Charge> charges;
   ChargeCalculator({required this.charges});
 
+  double applyRate(double price, double rate) {
+    return (price * rate / 100);
+  }
+
   double calculateFinalPrice(double basePrice) {
     double currentPrice = basePrice;
     for (final charge in charges) {
@@ -28,9 +32,5 @@ class ChargeCalculator {
     }
 
     return breakdown;
-  }
-
-  double applyRate(double price, double rate) {
-    return (price * rate / 100);
   }
 }

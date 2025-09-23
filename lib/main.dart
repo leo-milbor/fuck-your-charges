@@ -41,12 +41,6 @@ class _HomePageState extends State<HomePage> {
     ChargesConfigPage(calculator: widget.calculator),
   ];
 
-  void onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -104,5 +98,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void onItemTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
   }
 }
