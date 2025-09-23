@@ -55,6 +55,12 @@ class _PricesPageState extends State<PricesPage> {
   }
 
   @override
+  void initState() {
+    updateTotalBreakdown();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
