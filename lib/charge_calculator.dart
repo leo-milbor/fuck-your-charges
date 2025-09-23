@@ -11,8 +11,8 @@ class ChargeCalculator {
 
   double calculateFinalPrice(double basePrice) {
     double currentPrice = basePrice;
-    for (final tax in charges) {
-      currentPrice += (currentPrice * tax.rate);
+    for (final charge in charges) {
+      currentPrice += applyRate(currentPrice, charge.rate);
     }
     return currentPrice;
   }
@@ -22,11 +22,15 @@ class ChargeCalculator {
     double currentPrice = basePrice;
 
     for (final charge in charges) {
-      final chargeAmount = currentPrice * charge.rate;
+      final chargeAmount = applyRate(currentPrice, charge.rate);
       breakdown[charge.label] = chargeAmount;
       currentPrice += chargeAmount;
     }
 
     return breakdown;
+  }
+
+  double applyRate(double price, double rate) {
+    return (price * rate / 100);
   }
 }

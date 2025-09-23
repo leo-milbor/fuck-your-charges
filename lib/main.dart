@@ -1,38 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
-import 'package:fuck_your_charges/charge_calculator_config_page.dart';
+import 'package:fuck_your_charges/charge_config_page.dart';
 import 'package:fuck_your_charges/prices_page.dart';
 
 void main() {
   runApp(FuckYourChargesApp());
 }
 
-class FuckYourChargesApp extends StatefulWidget {
+class FuckYourChargesApp extends StatelessWidget {
   static const String title = 'Fuck your charges!';
 
-  final ChargeCalculator calculator = ChargeCalculator([
-    Charge(rate: 0.10, label: 'Service Charge'),
-    Charge(rate: 0.09, label: 'GST'),
-  ]);
+  const FuckYourChargesApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return HomePage();
+  }
+}
+
+class HomePage extends StatefulWidget {
+  final ChargeCalculator calculator = ChargeCalculator(
+    charges: [
+      Charge(rate: 10, label: 'Service Charge'),
+      Charge(rate: 9, label: 'GST'),
+    ],
+  );
 
   final List<double?> prices = [null];
 
-  FuckYourChargesApp({super.key});
+  HomePage({super.key});
 
   @override
-  State<FuckYourChargesApp> createState() => _FuckYourChargesAppState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _FuckYourChargesAppState extends State<FuckYourChargesApp> {
-  int _selectedIndex = 0;
+class _HomePageState extends State<HomePage> {
+  int selectedIndex = 0;
   List<Widget> get _widgetOptions => <Widget>[
     PricesPage(calculator: widget.calculator, prices: widget.prices),
-    ChargesCalculatorConfigPage(calculator: widget.calculator),
+    ChargesConfigPage(calculator: widget.calculator),
   ];
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      selectedIndex = index;
     });
   }
 
@@ -58,34 +69,38 @@ class _FuckYourChargesAppState extends State<FuckYourChargesApp> {
             },
           ),
         ),
-        body: Center(child: _widgetOptions[_selectedIndex]),
-        drawer: Drawer(
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.blue),
-                child: Text('Menu'),
+        body: Center(child: _widgetOptions[selectedIndex]),
+        drawer: Builder(
+          builder: (context) {
+            return Drawer(
+              child: ListView(
+                // Important: Remove any padding from the ListView.
+                padding: EdgeInsets.zero,
+                children: [
+                  const DrawerHeader(
+                    decoration: BoxDecoration(color: Colors.blue),
+                    child: Text('Menu'),
+                  ),
+                  ListTile(
+                    title: const Text('Prices'),
+                    selected: selectedIndex == 0,
+                    onTap: () {
+                      onItemTapped(0);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('Configure charges'),
+                    selected: selectedIndex == 1,
+                    onTap: () {
+                      onItemTapped(1);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
-              ListTile(
-                title: const Text('Prices'),
-                selected: _selectedIndex == 0,
-                onTap: () {
-                  _onItemTapped(0);
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('Configure charges'),
-                selected: _selectedIndex == 1,
-                onTap: () {
-                  _onItemTapped(1);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
