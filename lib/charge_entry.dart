@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
+import 'package:number_text_input_formatter/number_text_input_formatter.dart';
 
 class ChargeEntry extends StatefulWidget {
   final VoidCallback onDelete;
@@ -23,7 +25,8 @@ class ChargeEntry extends StatefulWidget {
 
 class _ChargeEntryState extends State<ChargeEntry>
     with AutomaticKeepAliveClientMixin {
-  late FocusNode focusNode;
+  late FocusNode labelFocusNode;
+  late FocusNode rateFocusNode;
   TextEditingController labelController = TextEditingController();
   TextEditingController rateController = TextEditingController();
   String? label;
@@ -46,6 +49,7 @@ class _ChargeEntryState extends State<ChargeEntry>
                 flex: 2,
                 child: TextField(
                   controller: labelController,
+                  inputFormatters: [LengthLimitingTextInputFormatter(20)],
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(
                     labelText: 'Label',
@@ -55,7 +59,7 @@ class _ChargeEntryState extends State<ChargeEntry>
                   onChanged: onUpdateLabel,
                   onEditingComplete: onValidate,
                   autofocus: true,
-                  focusNode: focusNode,
+                  focusNode: labelFocusNode,
                 ),
               ),
               SizedBox(width: 10),
@@ -63,14 +67,21 @@ class _ChargeEntryState extends State<ChargeEntry>
                 flex: 2,
                 child: TextField(
                   controller: rateController,
+                  inputFormatters: [
+                    PercentageTextInputFormatter(
+                      decimalDigits: 2,
+                      insertDecimalDigits: false,
+                      allowNegative: false,
+                    ),
+                  ],
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                     labelText: 'Rate',
                     border: OutlineInputBorder(),
                   ),
-                  maxLength: 6,
                   onChanged: onUpdateRate,
                   onEditingComplete: onValidate,
+                  focusNode: rateFocusNode,
                 ),
               ),
               const SizedBox(width: 16),
@@ -87,7 +98,8 @@ class _ChargeEntryState extends State<ChargeEntry>
 
   @override
   void dispose() {
-    focusNode.dispose();
+    labelFocusNode.dispose();
+    rateFocusNode.dispose();
     super.dispose();
   }
 
@@ -96,9 +108,11 @@ class _ChargeEntryState extends State<ChargeEntry>
     super.initState();
     label = widget.charge.label;
     labelController.text = label!;
+    labelFocusNode = FocusNode();
+
     rate = widget.charge.rate;
     rateController.text = rate!.toStringAsFixed(2);
-    focusNode = FocusNode();
+    rateFocusNode = FocusNode();
   }
 
   void onUpdate() {
@@ -122,7 +136,8 @@ class _ChargeEntryState extends State<ChargeEntry>
   void onValidate() {
     if (rate != null && label != null) {
       widget.onUserValidate();
-      focusNode.unfocus();
+      labelFocusNode.unfocus();
+      rateFocusNode.unfocus();
     }
   }
 }

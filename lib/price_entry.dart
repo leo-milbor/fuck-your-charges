@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
+import 'package:number_text_input_formatter/number_text_input_formatter.dart';
 
 class FullPrice extends StatelessWidget {
   final double? price;
@@ -94,11 +95,17 @@ class _PriceEntryState extends State<PriceEntry>
                 child: TextField(
                   controller: controller,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    CurrencyTextInputFormatter(
+                      decimalDigits: 2,
+                      allowNegative: false,
+                      maxValue: '10000.00',
+                    ),
+                  ],
                   decoration: const InputDecoration(
                     labelText: 'Base Price',
                     border: OutlineInputBorder(),
                   ),
-                  maxLength: 9,
                   onChanged: onUpdate,
                   onEditingComplete: onValidate,
                   autofocus: true,
