@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
 import 'package:fuck_your_charges/total_breakdown.dart';
-import 'package:fuck_your_charges/price_row.dart';
+import 'package:fuck_your_charges/price_entry.dart';
 
 class PriceTracker extends StatefulWidget {
   final ChargeCalculator calculator;
@@ -44,7 +44,7 @@ class _PriceTrackerState extends State<PriceTracker> {
     });
   }
 
-  void updatePrice(int index, double? price) {
+  void updatePrices(int index, double? price) {
     setState(() {
       prices[index] = price;
       updateTotalBreakdown();
@@ -70,12 +70,12 @@ class _PriceTrackerState extends State<PriceTracker> {
               return const Divider();
             },
             itemBuilder: (context, index) {
-              return PriceRow(
+              return PriceEntry(
                 key: keys[index],
                 price: prices[index],
                 calculator: widget.calculator,
                 onDelete: () => tryRemoveAt(index),
-                onUpdate: (price) => updatePrice(index, price),
+                onUpdate: (price) => updatePrices(index, price),
                 onUserValidate: tryAdd,
               );
             },

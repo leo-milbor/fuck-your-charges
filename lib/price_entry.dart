@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:fuck_your_charges/charge_calculator.dart';
 
-class PriceRow extends StatefulWidget {
+class PriceEntry extends StatefulWidget {
   final ChargeCalculator calculator;
   final VoidCallback onDelete;
   final VoidCallback onUserValidate;
   final Function(double?) onUpdate;
   final double? price;
 
-  const PriceRow({
+  const PriceEntry({
     super.key,
     required this.calculator,
     required this.onDelete,
@@ -19,11 +19,11 @@ class PriceRow extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _PriceRowState();
+    return _PriceEntryState();
   }
 }
 
-class _PriceRowState extends State<PriceRow>
+class _PriceEntryState extends State<PriceEntry>
     with AutomaticKeepAliveClientMixin {
   double? price;
   late PriceBreakDown priceBreakDown;
