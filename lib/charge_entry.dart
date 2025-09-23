@@ -29,49 +29,8 @@ class _ChargeEntryState extends State<ChargeEntry>
   String? label;
   double? rate;
 
-  void onUpdateLabel(String value) {
-    setState(() {
-      label = value;
-      if (rate != null && label != null) {
-        widget.onUpdate(Charge(rate: rate!, label: label!));
-      }
-    });
-  }
-
-  void onUpdateRate(String value) {
-    setState(() {
-      rate = double.tryParse(value);
-      if (rate != null && label != null) {
-        widget.onUpdate(Charge(rate: rate!, label: label!));
-      }
-    });
-  }
-
-  void onValidate() {
-    if (rate != null && label != null) {
-      widget.onUserValidate();
-      focusNode.unfocus();
-    }
-  }
-
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    label = widget.charge.label;
-    labelController.text = label == null ? "" : label!;
-    rate = widget.charge.rate;
-    rateController.text = rate == null ? "" : rate!.toStringAsFixed(2);
-    focusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    focusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,5 +83,46 @@ class _ChargeEntryState extends State<ChargeEntry>
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    label = widget.charge.label;
+    labelController.text = label!;
+    rate = widget.charge.rate;
+    rateController.text = rate!.toStringAsFixed(2);
+    focusNode = FocusNode();
+  }
+
+  void onUpdate() {
+    widget.onUpdate(Charge(rate: rate ?? 0, label: label ?? ""));
+  }
+
+  void onUpdateLabel(String value) {
+    setState(() {
+      label = value;
+      onUpdate();
+    });
+  }
+
+  void onUpdateRate(String value) {
+    setState(() {
+      rate = double.tryParse(value);
+      onUpdate();
+    });
+  }
+
+  void onValidate() {
+    if (rate != null && label != null) {
+      widget.onUserValidate();
+      focusNode.unfocus();
+    }
   }
 }
