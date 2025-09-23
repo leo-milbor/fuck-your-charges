@@ -4,8 +4,8 @@ import 'package:fuck_your_charges/charge_calculator.dart';
 class ChargeEntry extends StatefulWidget {
   final VoidCallback onDelete;
   final VoidCallback onUserValidate;
-  final Function(Charge?) onUpdate;
-  final Charge? charge;
+  final Function(Charge) onUpdate;
+  final Charge charge;
 
   const ChargeEntry({
     super.key,
@@ -60,9 +60,9 @@ class _ChargeEntryState extends State<ChargeEntry>
   @override
   void initState() {
     super.initState();
-    rate = widget.charge?.rate;
-    label = widget.charge?.label;
-    labelController.text = rate == null ? "" : label!;
+    label = widget.charge.label;
+    labelController.text = label == null ? "" : label!;
+    rate = widget.charge.rate;
     rateController.text = rate == null ? "" : rate!.toStringAsFixed(2);
     focusNode = FocusNode();
   }
@@ -109,7 +109,7 @@ class _ChargeEntryState extends State<ChargeEntry>
                     labelText: 'Rate',
                     border: OutlineInputBorder(),
                   ),
-                  maxLength: 5,
+                  maxLength: 6,
                   onChanged: onUpdateRate,
                   onEditingComplete: onValidate,
                 ),
