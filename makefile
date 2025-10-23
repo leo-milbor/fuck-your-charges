@@ -1,3 +1,6 @@
+run:
+	flutter run
+
 build-android: build-apk build-appbundle
 
 build-apk:
