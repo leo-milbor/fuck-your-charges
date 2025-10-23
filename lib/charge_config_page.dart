@@ -26,9 +26,9 @@ class _ChargesConfigPageState extends State<ChargesConfigPage> {
             itemBuilder: (context, index) {
               return ChargeEntry(
                 key: keys[index],
-                onDelete: () => tryRemoveAt(index),
-                onUpdate: (charge) => updateCharges(index, charge),
-                onUserValidate: tryAdd,
+                onDeleted: () => tryRemoveAt(index),
+                onUpdated: (charge) => updateCharges(index, charge),
+                onUserValidated: tryAdd,
                 charge: charges[index],
               );
             },

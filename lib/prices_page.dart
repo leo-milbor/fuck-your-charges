@@ -34,9 +34,9 @@ class _PricesPageState extends State<PricesPage> {
                 key: keys[index],
                 price: prices[index],
                 calculator: widget.calculator,
-                onDelete: () => tryRemoveAt(index),
-                onUpdate: (price) => updatePrices(index, price),
-                onUserValidate: tryAdd,
+                onDeleted: () => tryRemoveAt(index),
+                onUpdated: (price) => updatePrices(index, price),
+                onUserValidated: tryAdd,
               );
             },
           ),

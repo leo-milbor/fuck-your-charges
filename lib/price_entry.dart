@@ -49,17 +49,17 @@ class PriceBreakDown extends StatelessWidget {
 
 class PriceEntry extends StatefulWidget {
   final ChargeCalculator calculator;
-  final VoidCallback onDelete;
-  final VoidCallback onUserValidate;
-  final Function(double?) onUpdate;
+  final VoidCallback onDeleted;
+  final VoidCallback onUserValidated;
+  final Function(double?) onUpdated;
   final double? price;
 
   const PriceEntry({
     super.key,
     required this.calculator,
-    required this.onDelete,
-    required this.onUpdate,
-    required this.onUserValidate,
+    required this.onDeleted,
+    required this.onUpdated,
+    required this.onUserValidated,
     required this.price,
   });
 
@@ -96,7 +96,7 @@ class _PriceEntryState extends State<PriceEntry>
                   controller: controller,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
-                    CurrencyTextInputFormatter(
+                    NumberTextInputFormatter(
                       decimalDigits: 2,
                       allowNegative: false,
                       maxValue: '10000.00',
@@ -106,8 +106,8 @@ class _PriceEntryState extends State<PriceEntry>
                     labelText: 'Base Price',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: onUpdate,
-                  onEditingComplete: onValidate,
+                  onChanged: onUpdated,
+                  onEditingComplete: onValidated,
                   autofocus: true,
                   focusNode: focusNode,
                 ),
@@ -123,7 +123,7 @@ class _PriceEntryState extends State<PriceEntry>
               const SizedBox(width: 16),
               IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: widget.onDelete,
+                onPressed: widget.onDeleted,
               ),
             ],
           ),
@@ -153,7 +153,7 @@ class _PriceEntryState extends State<PriceEntry>
     focusNode = FocusNode();
   }
 
-  void onUpdate(String value) {
+  void onUpdated(String value) {
     setState(() {
       price = double.tryParse(value);
       priceBreakDown = PriceBreakDown(
@@ -161,13 +161,13 @@ class _PriceEntryState extends State<PriceEntry>
         price: price,
       );
       fullPrice = FullPrice(calculator: widget.calculator, price: price);
-      widget.onUpdate(price);
+      widget.onUpdated(price);
     });
   }
 
-  void onValidate() {
+  void onValidated() {
     if (price != null) {
-      widget.onUserValidate();
+      widget.onUserValidated();
       focusNode.unfocus();
     }
   }

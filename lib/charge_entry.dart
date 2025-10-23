@@ -4,16 +4,16 @@ import 'package:fuck_your_charges/charge_calculator.dart';
 import 'package:number_text_input_formatter/number_text_input_formatter.dart';
 
 class ChargeEntry extends StatefulWidget {
-  final VoidCallback onDelete;
-  final VoidCallback onUserValidate;
-  final Function(Charge) onUpdate;
+  final VoidCallback onDeleted;
+  final VoidCallback onUserValidated;
+  final Function(Charge) onUpdated;
   final Charge charge;
 
   const ChargeEntry({
     super.key,
-    required this.onDelete,
-    required this.onUpdate,
-    required this.onUserValidate,
+    required this.onDeleted,
+    required this.onUpdated,
+    required this.onUserValidated,
     required this.charge,
   });
 
@@ -55,9 +55,8 @@ class _ChargeEntryState extends State<ChargeEntry>
                     labelText: 'Label',
                     border: OutlineInputBorder(),
                   ),
-                  maxLength: 20,
-                  onChanged: onUpdateLabel,
-                  onEditingComplete: onValidate,
+                  onChanged: onLabelUpdated,
+                  onEditingComplete: onValidated,
                   autofocus: true,
                   focusNode: labelFocusNode,
                 ),
@@ -79,15 +78,15 @@ class _ChargeEntryState extends State<ChargeEntry>
                     labelText: 'Rate',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: onUpdateRate,
-                  onEditingComplete: onValidate,
+                  onChanged: onRateUpdated,
+                  onEditingComplete: onValidated,
                   focusNode: rateFocusNode,
                 ),
               ),
               const SizedBox(width: 16),
               IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: widget.onDelete,
+                onPressed: widget.onDeleted,
               ),
             ],
           ),
@@ -115,27 +114,27 @@ class _ChargeEntryState extends State<ChargeEntry>
     rateFocusNode = FocusNode();
   }
 
-  void onUpdate() {
-    widget.onUpdate(Charge(rate: rate ?? 0, label: label ?? ""));
+  void onUpdated() {
+    widget.onUpdated(Charge(rate: rate ?? 0, label: label ?? ""));
   }
 
-  void onUpdateLabel(String value) {
+  void onLabelUpdated(String value) {
     setState(() {
       label = value;
-      onUpdate();
+      onUpdated();
     });
   }
 
-  void onUpdateRate(String value) {
+  void onRateUpdated(String value) {
     setState(() {
       rate = double.tryParse(value);
-      onUpdate();
+      onUpdated();
     });
   }
 
-  void onValidate() {
+  void onValidated() {
     if (rate != null && label != null) {
-      widget.onUserValidate();
+      widget.onUserValidated();
       labelFocusNode.unfocus();
       rateFocusNode.unfocus();
     }
