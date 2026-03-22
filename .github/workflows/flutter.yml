@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ main ]
   push:
-    branches: [ spec-agents-and-ui-tests ]
+    branches: [ main ]
 
 jobs:
   build:
