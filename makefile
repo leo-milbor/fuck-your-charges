@@ -1,10 +1,31 @@
+# Makefile
+
+# Variables
+FLUTTER=flutter
+
+.PHONY: ci analyze test test-coverage format-check
+
+# Existing targets
 run:
-	flutter run
+	$(FLUTTER) run
 
-build-android: build-apk build-appbundle
+build:
+	$(FLUTTER) build
 
-build-apk:
-	flutter build apk --release
+# New targets
+ci:
+	$(FLUTTER) pub get
+	$(FLUTTER) analyze
+	$(FLUTTER) test
+	$(FLUTTER) test --coverage
 
-build-appbundle:
-	flutter build appbundle --release
+analyze:
+	$(FLUTTER) analyze
+
+test:
+	$(FLUTTER) test
+test-coverage:
+	$(FLUTTER) test --coverage
+
+format-check:
+	$(FLUTTER) format --set-exit-if-changed .
