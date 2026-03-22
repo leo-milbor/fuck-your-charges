@@ -3,14 +3,19 @@
 # Variables
 FLUTTER=flutter
 
-.PHONY: ci analyze test test-coverage format-check
+.PHONY: ci analyze test test-coverage format-check build-android build-apk build-appbundle
 
 # Existing targets
 run:
 	$(FLUTTER) run
 
-build:
-	$(FLUTTER) build
+build-android: build-apk build-appbundle
+
+build-apk:
+	$(FLUTTER) build apk --release
+
+build-appbundle:
+	$(FLUTTER) build appbundle --release
 
 # New targets
 ci:
